@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using MsmqSample.Common.Application.Dto;
 using MsmqSample.Common.Entities;
 using MsmqSample.Common.Infrastructure.Code;
@@ -31,7 +33,7 @@ namespace MsmqSample.ConsoleApp
                     //обрабатываем сообщения
                     await ReceiveTasks(token);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
@@ -54,6 +56,7 @@ namespace MsmqSample.ConsoleApp
             var taskRepo = new TaskRepository(dbContext);
             try
             {
+                var receivedTasks = new List<SampleTask>(100);
                 dbContext.Database.BeginTransaction();
                 await _consumer.Consume<CreateSampleTaskDto>(async (taskDto) =>
                 {
@@ -61,9 +64,21 @@ namespace MsmqSample.ConsoleApp
                     {
                         Description = taskDto.Description
                     };
-                    await taskRepo.CreateAsync(task, token);
+                    var savedTask = await taskRepo.CreateAsync(task, token);
+                    receivedTasks.Add(savedTask);
                 });
                 dbContext.Database.CommitTransaction();
+                if (receivedTasks.Count > 0)
+                {
+                    Console.WriteLine("----------------");
+                    Console.WriteLine("Из очереди прочитаны и сохранены задачи:");
+                    receivedTasks.ForEach(t =>
+                    {
+                        Console.WriteLine($"TaskID: {t.TaskId}, " +
+                            $"Description: {t.Description}, " +
+                            $"CreateDate: {t.CreateTime.ToLocalTime()}");
+                    });
+                }
             }
             catch (Exception ex)
             {

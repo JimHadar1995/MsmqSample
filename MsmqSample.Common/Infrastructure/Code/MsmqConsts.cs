@@ -4,6 +4,9 @@ using System.Text;
 
 namespace MsmqSample.Common.Infrastructure.Code
 {
+    /// <summary>
+    /// Константы для Msmq
+    /// </summary>
     public class MsmqConsts
     {
         /// <summary>

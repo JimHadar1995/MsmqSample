@@ -23,6 +23,6 @@ namespace MsmqSample.Common.Application.Repositories
         /// <param name="task">Задача для создания</param>
         /// <param name="token"></param>
         /// <returns>Идентификатор созданной задачи.</returns>
-        Task<int> CreateAsync(SampleTask task, CancellationToken token);
+        Task<SampleTask> CreateAsync(SampleTask task, CancellationToken token);
     }
 }

@@ -34,12 +34,14 @@ namespace MsmqSample.Common.Infrastructure.Services
                 queueToCreate.Label = _queueName;
             }
 
-            using var queue = new MessageQueue(_queueName);
-            queue.Formatter = new XmlMessageFormatter(
+            using var queue = new MessageQueue(_queueName)
+            {
+                Formatter = new XmlMessageFormatter(
                 new Type[]
                 {
                     typeof(T)
-                });
+                })
+            };
 
             var messages = queue.GetAllMessages();
 
@@ -56,7 +58,7 @@ namespace MsmqSample.Common.Infrastructure.Services
             }
 
             //сли все завершилось успешно, то удаляем сообщения из очереди
-            foreach(var message in messages)
+            foreach (var message in messages)
             {
                 try
                 {

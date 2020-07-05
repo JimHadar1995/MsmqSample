@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -25,10 +23,11 @@ namespace MsmqSample.Common.Infrastructure.Repositories
         }
 
         /// <inheritdoc />
-        public Task<int> CreateAsync(SampleTask task, CancellationToken token)
+        public async Task<SampleTask> CreateAsync(SampleTask task, CancellationToken token)
         {
             _dbContext.Set<SampleTask>().Add(task);
-            return _dbContext.SaveChangesAsync(token);
+            await _dbContext.SaveChangesAsync(token);
+            return task;
         }
 
         /// <inheritdoc />
